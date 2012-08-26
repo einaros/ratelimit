@@ -1,0 +1,15 @@
+{
+  "name": "ratelimit",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --nouse-idle-notification node_modules/.bin/mocha -t 15000 -R list"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD",
+  "dependencies": {
+    "mocha": "~1.4.0"
+  }
+}
