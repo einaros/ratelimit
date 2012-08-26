@@ -189,9 +189,9 @@ describe('Rate limiting', function() {
             var endTime = Date.now();
             var bytesPerSec = dataLength / (endTime - startTime) * 1000;
             var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
-            console.log('Target: ' + speed + ' MB/sec');
-            console.log('Actual: ' + roundPrec(bytesPerSec / 1048576, 2) + ' MB/sec');
-            console.log('Deviance: ' + roundPrec(deviance * 100, 2) + '%');
+            // console.log('Target: ' + speed + ' MB/sec');
+            // console.log('Actual: ' + roundPrec(bytesPerSec / 1048576, 2) + ' MB/sec');
+            // console.log('Deviance: ' + roundPrec(deviance * 100, 2) + '%');
             assert.ok(deviance < 0.05);
             server.close();
             done();
