@@ -1,13 +1,13 @@
 {
   "name": "ratelimit",
   "version": "0.0.1",
-  "description": "",
+  "description": "simple stream rate limiting for node.js",
   "main": "index.js",
   "scripts": {
     "test": "node --nouse-idle-notification node_modules/.bin/mocha -t 15000 -R list"
   },
   "repository": "",
-  "author": "",
+  "author": "Einar Otto Stangvik <einaros@gmail.com>",
   "license": "BSD",
   "dependencies": {
     "mocha": "~1.4.0"
