@@ -158,46 +158,46 @@ describe('Rate limiting', function() {
     });
   });
 
-  // describe('writable streams', function() {
-  //   var randomData = generateRandomData(1048576);
+  describe('writable streams', function() {
+    var randomData = generateRandomData(1048576);
 
-  //   [1, 2, 10, 100, 500].forEach(function(speed) {
-  //     var targetBytesPersSec = speed * 1048576;
-  //     var duration = 3000;
+    [1, 2, 10, 100, 500].forEach(function(speed) {
+      var targetBytesPersSec = speed * 1048576;
+      var duration = 3000;
 
-  //     it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', function(done) {
-  //       var stop = false;
-  //       setTimeout(function() { stop = true; }, duration);
-  //       var server = net.createServer(function(c) {
-  //         var r = ratelimit(c, targetBytesPersSec);
-  //         r.write(randomData);
-  //         c.on('drain', function() {
-  //           if (!stop) r.write(randomData);
-  //           else c.end();
-  //         });
-  //       });
-  //       server.listen(8765, function() {
-  //         var client = net.connect({port: 8765});
-  //         var startTime;
-  //         var dataLength = 0;
-  //         client.on('data', function(data) {
-  //           var now = Date.now();
-  //           dataLength += data.length;
-  //           if (!startTime) startTime = now;
-  //         });
-  //         client.on('end', function() {
-  //           var endTime = Date.now();
-  //           var bytesPerSec = dataLength / (endTime - startTime) * 1000;
-  //           var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
-  //           console.log('Target: ' + speed + ' MB/sec');
-  //           console.log('Actual: ' + roundPrec(bytesPerSec / 1048576, 2) + ' MB/sec');
-  //           console.log('Deviance: ' + roundPrec(deviance * 100, 2) + '%');
-  //           assert.ok(deviance < 0.05);
-  //           server.close();
-  //           done();
-  //         });
-  //       });
-  //     });
-  //   });
-  // });
+      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', function(done) {
+        var stop = false;
+        setTimeout(function() { stop = true; }, duration);
+        var server = net.createServer(function(c) {
+          var r = ratelimit(c, targetBytesPersSec);
+          r.write(randomData);
+          c.on('drain', function() {
+            if (!stop) r.write(randomData);
+            else c.end();
+          });
+        });
+        server.listen(8765, function() {
+          var client = net.connect({port: 8765});
+          var startTime;
+          var dataLength = 0;
+          client.on('data', function(data) {
+            var now = Date.now();
+            dataLength += data.length;
+            if (!startTime) startTime = now;
+          });
+          client.on('end', function() {
+            var endTime = Date.now();
+            var bytesPerSec = dataLength / (endTime - startTime) * 1000;
+            var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
+            console.log('Target: ' + speed + ' MB/sec');
+            console.log('Actual: ' + roundPrec(bytesPerSec / 1048576, 2) + ' MB/sec');
+            console.log('Deviance: ' + roundPrec(deviance * 100, 2) + '%');
+            assert.ok(deviance < 0.05);
+            server.close();
+            done();
+          });
+        });
+      });
+    });
+  });
 });
