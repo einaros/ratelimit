@@ -16,17 +16,24 @@ function roundPrec(num, prec) {
 http.get('http://upload.wikimedia.org/wikipedia/commons/6/60/Eol.jsc.nasa.gov_ESC_large_ISS005_ISS005-E-16279.JPG', function(res) {
   console.log('Got response: ' + res.statusCode + '. Please wait while file downloads.\n');
 
-  // Limit bursts to around 200 kB/sec
-  ratelimit(res, 100 * 1024);
+  // Limit bursts to around 100 kB/sec
+  var limit = ratelimit(res, 65 * 1024);
+  // Clear the rate limit after some time
+  // setTimeout(limit.end, 7000);
 
   var dataLength = 0;
   var startTime;
   res.on('data', function(data) {
-    if (!startTime) startTime = Date.now();
+    var now = Date.now();
+    if (!startTime) startTime = now;
     dataLength += data.length;
-    var bytesPerSec = dataLength / (Date.now() - startTime) * 1000;
+    var bytesPerSec = dataLength / (now - startTime) * 1000;
     cursor.up().eraseLine();
-    console.log('Average speed: %s/sec', humanSize(bytesPerSec, 2));
+    console.log('Average over last two seconds: %s/sec', humanSize(bytesPerSec, 2));
+    if (now - startTime > 2000) {
+      startTime = now;
+      dataLength = 0;
+    }
   });
 }).on('error', function(e) {
   console.log("Got error: " + e.message);
