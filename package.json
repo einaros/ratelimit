@@ -1,6 +1,6 @@
 {
   "name": "ratelimit",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "simple stream rate limiting for node.js",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
   "repository": "",
   "author": "Einar Otto Stangvik <einaros@gmail.com>",
   "license": "BSD",
-  "dependencies": {
+  "devDependencies": {
     "mocha": "~1.4.0"
   }
 }
