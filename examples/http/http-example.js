@@ -1,6 +1,6 @@
-var http = require('http')
-  , ratelimit = require('../../')
-  , cursor = require('ansi')(process.stdout);
+var http = require('http');
+var ratelimit = require('../../');
+var cursor = require('ansi')(process.stdout);
 
 function humanSize(bytes) {
   if (bytes >= 1048576) return roundPrec(bytes / 1048576, 2) + ' MB';
@@ -9,11 +9,11 @@ function humanSize(bytes) {
 }
 
 function roundPrec(num, prec) {
-  var mul = Math.pow(10, prec);
+  var mul = 10 ** prec;
   return Math.round(num * mul) / mul;
 }
 
-http.get('http://upload.wikimedia.org/wikipedia/commons/6/60/Eol.jsc.nasa.gov_ESC_large_ISS005_ISS005-E-16279.JPG', function(res) {
+http.get('http://upload.wikimedia.org/wikipedia/commons/6/60/Eol.jsc.nasa.gov_ESC_large_ISS005_ISS005-E-16279.JPG', res => {
   console.log('Got response: ' + res.statusCode + '. Please wait while file downloads.\n');
 
   // Limit bursts to around 100 kB/sec
@@ -23,7 +23,7 @@ http.get('http://upload.wikimedia.org/wikipedia/commons/6/60/Eol.jsc.nasa.gov_ES
 
   var dataLength = 0;
   var startTime;
-  res.on('data', function(data) {
+  res.on('data', data => {
     var now = Date.now();
     if (!startTime) startTime = now;
     dataLength += data.length;
@@ -35,6 +35,6 @@ http.get('http://upload.wikimedia.org/wikipedia/commons/6/60/Eol.jsc.nasa.gov_ES
       dataLength = 0;
     }
   });
-}).on('error', function(e) {
+}).on('error', e => {
   console.log("Got error: " + e.message);
 });
