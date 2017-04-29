@@ -1,8 +1,8 @@
-var ratelimit = require('../lib/ratelimit')
-  , assert = require('assert')
-  , net = require('net')
-  , fs = require('fs')
-  , stream = require('stream');
+var ratelimit = require('../lib/ratelimit');
+var assert = require('assert');
+var net = require('net');
+var fs = require('fs');
+var stream = require('stream');
 
 function generateRandomData(size) {
   var buffer = new Buffer(size);
@@ -13,7 +13,7 @@ function generateRandomData(size) {
 }
 
 function roundPrec(num, prec) {
-  var mul = Math.pow(10, prec);
+  var mul = 10 ** prec;
   return Math.round(num * mul) / mul;
 }
 
@@ -31,24 +31,24 @@ function generateRandomData(size) {
   return buffer;
 }
 
-describe('Rate limiting', function() {
-  describe('of readable file streams', function() {
-    [0.5, 1, 2, 10].forEach(function(speed) {
+describe('Rate limiting', () => {
+  describe('of readable file streams', () => {
+    [0.5, 1, 2, 10].forEach(speed => {
       var targetBytesPersSec = speed * 1048576;
       var duration = 3000;
 
-      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', function(done) {
+      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', done => {
         var stream = fs.createReadStream('/dev/urandom');
-        setTimeout(function() { stream.destroy(); }, duration);
+        setTimeout(() => { stream.destroy(); }, duration);
         var r = ratelimit(stream, targetBytesPersSec);
         var startTime;
         var dataLength = 0;
-        stream.on('data', function(data) {
+        stream.on('data', data => {
           var now = Date.now();
           dataLength += data.length;
           if (!startTime) startTime = now;
         });
-        stream.on('close', function() {
+        stream.on('close', () => {
           var endTime = Date.now();
           var bytesPerSec = dataLength / (endTime - startTime) * 1000;
           var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
@@ -61,19 +61,19 @@ describe('Rate limiting', function() {
       });
     });
 
-    it('can be stopped', function(done) {
+    it('can be stopped', done => {
       var stream = fs.createReadStream('/dev/urandom');
-      setTimeout(function() { stream.destroy(); }, 1500);
+      setTimeout(() => { stream.destroy(); }, 1500);
       var r = ratelimit(stream, 512*1024);
       r.end();
       var startTime;
       var dataLength = 0;
-      stream.on('data', function(data) {
+      stream.on('data', data => {
         var now = Date.now();
         dataLength += data.length;
         if (!startTime) startTime = now;
       });
-      stream.on('close', function() {
+      stream.on('close', () => {
         var endTime = Date.now();
         var bytesPerSec = dataLength / (endTime - startTime) * 1000;
         var deviance = Math.abs(1048576 - bytesPerSec) / 1048576;
@@ -83,34 +83,34 @@ describe('Rate limiting', function() {
     });
   });
 
-  describe('of readable network streams', function() {
+  describe('of readable network streams', () => {
     var randomData = generateRandomData(1048576);
 
-    [0.1, 1, 2, 10, 100, 500].forEach(function(speed) {
+    [0.1, 1, 2, 10, 100, 500].forEach(speed => {
       var targetBytesPersSec = speed * 1048576;
       var duration = 3000;
 
-      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', function(done) {
+      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', done => {
         var stop = false;
-        setTimeout(function() { stop = true; }, duration);
-        var server = net.createServer(function(c) {
+        setTimeout(() => { stop = true; }, duration);
+        var server = net.createServer(c => {
           c.write(randomData);
-          c.on('drain', function() {
+          c.on('drain', () => {
             if (!stop) c.write(randomData);
             else c.end();
           });
         });
-        server.listen(8765, function() {
+        server.listen(8765, () => {
           var client = net.connect({port: 8765});
           var r = ratelimit(client, targetBytesPersSec);
           var startTime;
           var dataLength = 0;
-          client.on('data', function(data) {
+          client.on('data', data => {
             var now = Date.now();
             dataLength += data.length;
             if (!startTime) startTime = now;
           });
-          client.on('end', function() {
+          client.on('end', () => {
             var endTime = Date.now();
             var bytesPerSec = dataLength / (endTime - startTime) * 1000;
             var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
@@ -125,28 +125,28 @@ describe('Rate limiting', function() {
       });
     });
 
-    it('can be stopped', function(done) {
+    it('can be stopped', done => {
       var stop = false;
-      setTimeout(function() { stop = true; }, 1500);
-      var server = net.createServer(function(c) {
+      setTimeout(() => { stop = true; }, 1500);
+      var server = net.createServer(c => {
         c.write(randomData);
-        c.on('drain', function() {
+        c.on('drain', () => {
           if (!stop) c.write(randomData);
           else c.end();
         });
       });
-      server.listen(8765, function() {
+      server.listen(8765, () => {
         var client = net.connect({port: 8765});
         var r = ratelimit(client, 1048576);
         r.end();
         var startTime;
         var dataLength = 0;
-        client.on('data', function(data) {
+        client.on('data', data => {
           var now = Date.now();
           dataLength += data.length;
           if (!startTime) startTime = now;
         });
-        client.on('end', function() {
+        client.on('end', () => {
           var endTime = Date.now();
           var bytesPerSec = dataLength / (endTime - startTime) * 1000;
           var deviance = Math.abs(1048576 - bytesPerSec) / 1048576;
@@ -158,34 +158,34 @@ describe('Rate limiting', function() {
     });
   });
 
-  describe('writable streams', function() {
+  describe('writable streams', () => {
     var randomData = generateRandomData(1048576);
 
-    [1, 2, 10, 100, 500].forEach(function(speed) {
+    [1, 2, 10, 100, 500].forEach(speed => {
       var targetBytesPersSec = speed * 1048576;
       var duration = 3000;
 
-      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', function(done) {
+      it('limits the rate to ' + speed + 'MB/sec within 95% accuracy', done => {
         var stop = false;
-        setTimeout(function() { stop = true; }, duration);
-        var server = net.createServer(function(c) {
+        setTimeout(() => { stop = true; }, duration);
+        var server = net.createServer(c => {
           var r = ratelimit(c, targetBytesPersSec);
           r.write(randomData);
-          c.on('drain', function() {
+          c.on('drain', () => {
             if (!stop) r.write(randomData);
             else c.end();
           });
         });
-        server.listen(8765, function() {
+        server.listen(8765, () => {
           var client = net.connect({port: 8765});
           var startTime;
           var dataLength = 0;
-          client.on('data', function(data) {
+          client.on('data', data => {
             var now = Date.now();
             dataLength += data.length;
             if (!startTime) startTime = now;
           });
-          client.on('end', function() {
+          client.on('end', () => {
             var endTime = Date.now();
             var bytesPerSec = dataLength / (endTime - startTime) * 1000;
             var deviance = Math.abs(targetBytesPersSec - bytesPerSec) / targetBytesPersSec;
